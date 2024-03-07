@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\DB;
 class levelController extends Controller
 {
     public function index(){
-        // DB::insert('insert into m_level(level_kode, level_nama, created_at) values(?, ?, ?)',['CUS','pelanggan', now()]);
-        // return 'insert data baru berhasil';
+        DB::insert('insert into m_level(level_kode, level_nama, created_at) values(?, ?, ?)',['CUS','Customer', now()]);
+        return 'insert data baru berhasil';
 
         // $row = DB::update('update m_level set level_nama = ? where level_kode = ?',['Customer','CUS']);
         // return 'update data berhasil, jumlah yang diupdate' .$row. ' baris';
