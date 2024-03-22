@@ -1,4 +1,30 @@
-<!DOCTYPE html>
+@extends('layouts.app')
+
+@section('subtitle','welcome')
+@section('content_header_title','home')
+@section('content_header_title','welcome')
+
+@section('content_body')
+    <p>Welcome to this beatiful admin panel</p>
+@stop
+
+@push('css')
+    
+@endpush
+
+@push('js')
+    <script>consol.log("HO! i'm using the laravel-AdminLTE package!");</script>
+@endpush
+
+
+
+
+
+
+
+
+
+{{-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
@@ -130,4 +156,4 @@
             </div>
         </div>
     </body>
-</html>
+</html> --}}
