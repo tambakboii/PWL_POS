@@ -2,51 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\BarangRequest;
-use App\Models\KategoriModel;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\Request;
+use App\Http\Requests\StokRequest;
 use App\Models\BarangModel;
+use App\Models\UserModel;
+use App\Models\StokModel;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
-class barangController extends Controller
+class StokController extends Controller
 {
     public function index()
     {
         $breadcrumb = (object)[
-            'title' => 'Daftar Barang',
-            'list' => ['Home', 'Barang']
+            'title' => 'Daftar Stok Barang',
+            'list' => ['Home', 'Stok']
         ];
 
         $page = (object)[
-            'title' => 'Daftar Barang yang tersedia'
+            'title' => 'Daftar Stok barang yang tersedia'
         ];
 
-        $activeMenu = 'barang';
-        $kategori = KategoriModel::all();
+        $activeMenu = 'stok';
+        $barang = BarangModel::all();
+        $user = UserModel::all();
 
-        return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page,
-            'kategori' => $kategori, 'activeMenu' => $activeMenu]);
+        return view('stok.index', ['breadcrumb' => $breadcrumb, 'page' => $page,
+            'user' => $user, 'barang' => $barang, 'activeMenu' => $activeMenu]);
     }
 
     public function list(Request $request)
     {
-        $barangs = BarangModel::select('barang_id', 'barang_kode', 'barang_nama',
-            'harga_beli', 'harga_jual', 'kategori_id')->with('kategori');
+        $stocks = StokModel::select(['stok_id', 'barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah'])->with(['barang', 'user']);
 
-//        FIltering data
-        if ($request->kategori_id) {
-            $barangs->where('kategori_id', $request->kategori_id);
+        // Filter data user berdasarkan level_id
+        if ($request->barang_id) {
+            $stocks->where('barang_id', $request->barang_id);
         }
 
-        return DataTables::of($barangs)
+        return DataTables::of($stocks)
             ->addIndexColumn()
-            ->addColumn('aksi', function ($barang) { // menambahkan kolom aksi
-                $btn = '<a href="' . url('/barang/' . $barang->barang_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="' . url('/barang/' . $barang->barang_id . '/edit') . '"class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="' . url('/barang/' . $barang->barang_id) . '"> ' . csrf_field() . method_field('DELETE')
+            ->addColumn('aksi', function ($stok) { // menambahkan kolom aksi
+                $btn = '<a href="' . url('/stok/' . $stok->stok_id) . '" class="btn btn-info btn-sm">Detail</a> ';
+                $btn .= '<a href="' . url('/stok/' . $stok->stok_id . '/edit') . '"class="btn btn-warning btn-sm">Edit</a> ';
+                $btn .= '<form class="d-inline-block" method="POST" action="' . url('/user/' . $stok->stok_id) . '"> ' . csrf_field() . method_field('DELETE')
                     . '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakit menghapus data ini?\');">Hapus</button></form>';
                 return $btn;
             })
@@ -56,117 +57,114 @@ class barangController extends Controller
 
     public function create(): view
     {
-        $breadcrumb = (object)[
-            'title' => 'Tambah Barang',
-            'list' => ['Home', 'Barang', 'Tambah']
+        $breadcrumb = (object) [
+            'title' => 'Tambah Stok Barang',
+            'list' => ['Home', 'Stok Barang', 'Tambah']
         ];
 
-        $page = (object)[
-            'title' => "Tambah Barang Baru"
+        $page = (object) [
+            'title' => 'Tambah stok barang baru'
         ];
 
-        $kategori = KategoriModel::all();
-        $activeMenu = 'barang';
-
-        return view('barang.create', ['breadcrumb' => $breadcrumb, 'page' => $page,
-            'kategori' => $kategori, 'activeMenu' => $activeMenu]);
+        $barang = BarangModel::all();
+        $user = UserModel::all();
+        $activeMenu = 'stok';
+        return view('stok.create', ['breadcrumb' => $breadcrumb, 'page' => $page,
+            'barang' => $barang, 'user' => $user, 'activeMenu' => $activeMenu]);
     }
 
-    public function store(BarangRequest $request): RedirectResponse
+    public function store(StokRequest $request): RedirectResponse
     {
         $request->validate([
-            'barang_kode' => 'required|string|min:3|unique:m_barang,barang_kode',
-            'barang_nama' => 'required|string|max:100',
-            'harga_beli' => 'required|integer',
-            'harga_jual' => 'required|integer',
-            'kategori_id' => 'required|integer'
+            'stok_tanggal' => 'required|date',
+            'stok_jumlah' => 'required|integer|max:40',
+            'barang_id' => 'required|integer',
+            'user_id' => 'required|integer'
         ]);
 
-        BarangModel::create([
-            'barang_kode' => $request->barang_kode,
-            'barang_nama' => $request->barang_nama,
-            'harga_beli' => $request->harga_beli,
-            'harga_jual' => $request->harga_jual,
-            'kategori_id' => $request->kategori_id,
+        StokModel::create([
+            'stok_tanggal' => $request->stok_tanggal,
+            'stok_jumlah' => $request->stok_jumlah,
+            'barang_id' => $request->barang_id,
+            'user_id' => $request->user_id,
         ]);
 
-        return redirect('/barang')->with('success', 'Data barang berhasil disimpan');
+        return redirect('/stok')->with('success', 'Data stok berhasil disimpan');
     }
 
     public function show(string $id)
     {
-        $barang = BarangModel::with('kategori')->find($id);
+        $stok = StokModel::with('barang', 'user')->find($id);
 
         $breadcrumb = (object)[
-            'title' => 'Detail Barang',
-            'list' => ['Home', 'Barang', 'Detail']
+            'title' => 'Detail Stok Barang',
+            'list' => ['Home', 'Stok', 'Detail']
         ];
 
         $page = (object)[
-            'title' => "Detail Barang"
+            'title' => "Detail Stok Barang"
         ];
 
-        $activeMenu = 'barang';
+        $activeMenu = 'stok';
 
-        return view('barang.show', ['breadcrumb' => $breadcrumb, 'page' => $page, 'barang' => $barang,
-            'activeMenu' => $activeMenu]);
+        return view('stok.show', ['breadcrumb' => $breadcrumb, 'page' => $page,
+            'stok' => $stok, 'activeMenu' => $activeMenu]);
     }
 
     public function edit(string $id)
     {
-        $barang = BarangModel::find($id);
-        $kategori = KategoriModel::all();
+        $stok = StokModel::find($id);
+        $user = UserModel::all();
+        $barang = BarangModel::all();
 
         $breadcrumb = (object)[
-            'title' => 'Edit Barang',
-            'list' => ['Home', 'Barang', 'Edit']
+            'title' => 'Edit Stok Barang',
+            'list' => ['Home', 'Stok', 'Edit']
         ];
 
         $page = (object)[
-            'title' => "Edit Barang"
+            'title' => "Edit Stok Barang"
         ];
 
-        $activeMenu = 'barang';
+        $activeMenu = 'stok';
 
-        return view('barang.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'barang' => $barang,
-            'kategori' => $kategori, 'activeMenu' => $activeMenu]);
+        return view('stok.edit', ['breadcrumb' => $breadcrumb, 'page' => $page,
+            'stok' => $stok, 'user' => $user, 'barang' => $barang, 'activeMenu' => $activeMenu]);
     }
 
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'barang_kode' => 'required|string|min:3|unique:m_barang,barang_kode,' . $id . ',barang_id',
-            'barang_nama' => 'required|string|max:100',
-            'harga_beli' => 'required|integer',
-            'harga_jual' => 'required|integer',
-            'kategori_id' => 'required|integer'
+            'stok_tanggal' => 'required|date',
+            'stok_jumlah' => 'required|integer|max:10',
+            'barang_id' => 'required|integer',
+            'user_id' => 'required|integer'
         ]);
 
-        BarangModel::find($id)->update([
-            'barang_kode' => $request->barang_kode,
-            'barang_nama' => $request->barang_nama,
-            'harga_beli' => $request->harga_beli,
-            'harga_jual' => $request->harga_jual,
-            'kategori_id' => $request->kategori_id,
+        StokModel::find($id)->update([
+            'stok_tanggal' => $request->stok_tanggal,
+            'stok_jumlah' => $request->stok_jumlah,
+            'barang_id' => $request->barang_id,
+            'user_id' => $request->user_id,
         ]);
 
-        return redirect('/barang')->with('success', 'Data barang berhasil diubah');
+        return redirect('/stok')->with('success', 'Data stok berhasil diubah');
     }
 
     public function destroy(string $id)
     {
-        $check = BarangModel::find($id);
+        $check = StokModel::find($id);
         if (!$check) {
-            return redirect('/barang')->with('error', 'Data barang tidak ditermukan');
+            return redirect('/stok')->with('error', 'Data Stok tidak ditermukan');
         }
 
         try {
-            BarangModel::destroy($id);
+            StokModel::destroy($id);
 
-            return redirect('/barang')->with('success', 'Data barang berhasil dihapus');
+            return redirect('/stok')->with('success', 'Data stok berhasil dihapus');
         } catch (QueryException $e) {
 
-            return redirect('/barang')->with('error', 'Data barang gagal dihapus, karena masih terdapat tabel lain yang terkait dengan data ini');
+            return redirect('/stok')->with('error', 'Data stok gagal dihapus, karena masih terdapat tabel lain yang terkait dengan data ini');
         }
     }
 }

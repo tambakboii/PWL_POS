@@ -2,9 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\levelController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\kategoriController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\barangController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\stokController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +56,7 @@ Route::get('/', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
-Route::prefix('user')->group(function () {
+Route::group(['prefix'=>'user'], function () {
     Route::get('/', [UserController::class, 'index']);
     Route::post('/list', [UserController::class, 'list']);
     Route::get('/create', [UserController::class, 'create']);
@@ -78,3 +81,30 @@ Route::post('stok/list', [stokController::class, 'list']);
 
 Route::resource('penjualan', TransaksiPenjualanController::class);
 Route::post('penjualan/list', [TransaksiPenjualanController::class, 'list']);
+
+
+Route::get('login', [AuthController::class, 'index'])->name('login');
+Route::get('register', [AuthController::class, 'register'])->name('register');
+Route::post('proses_login', [AuthController::class, 'proses_login'])->name('proses_login');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('proses_register', [AuthController::class, 'proses_register'])->name('proses_register');
+
+/**
+ * use Authentication class using middleware aliases in http/kernel
+ * to redirect users when they are not authenticate
+ */
+Route::group(['middleware' => ['auth']], function () {
+
+    /**
+     * if user is admin
+     */
+    Route::group(['middleware' => ['cek_login:1']], function () {
+        Route::resource('admin', AdminController::class);
+    });
+    /**
+     * if user is manager
+     */
+    Route::group(['middleware' => ['cek_login:2']], function () {
+        Route::resource('manager', ManagerController::class);
+    });
+});

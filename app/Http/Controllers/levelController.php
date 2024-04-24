@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
-class levelController extends Controller
+class LevelController extends Controller
 {
     public function index()
     {
@@ -129,7 +129,7 @@ class levelController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'level_kode' => 'required|string|min:3|max:5|unique:m_level,level_kode,' . $id . ',level_id',
+            'level_kode' => 'required|string|min:3|max:5|unique:Level,level_kode,' . $id . ',level_id',
             'level_nama' => 'required|string|max:100'
         ]);
 

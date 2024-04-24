@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BarangRequest;
-use App\Models\kategoriModel;
+use App\Models\KategoriModel;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Models\BarangModel;
@@ -75,7 +75,7 @@ class barangController extends Controller
     public function store(BarangRequest $request): RedirectResponse
     {
         $request->validate([
-            'barang_kode' => 'required|string|min:3|unique:m_barang,barang_kode',
+            'barang_kode' => 'required|string|min:3|unique:barang,barang_kode',
             'barang_nama' => 'required|string|max:100',
             'harga_beli' => 'required|integer',
             'harga_jual' => 'required|integer',
@@ -135,7 +135,7 @@ class barangController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'barang_kode' => 'required|string|min:3|unique:m_barang,barang_kode,' . $id . ',barang_id',
+            'barang_kode' => 'required|string|min:3|unique:barang,barang_kode,' . $id . ',barang_id',
             'barang_nama' => 'required|string|max:100',
             'harga_beli' => 'required|integer',
             'harga_jual' => 'required|integer',
