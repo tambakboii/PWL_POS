@@ -24,36 +24,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/level',[levelController::class,'index']);
-// Route::get('/kategori',[kategoriController::class,'index']);
-// Route::get('/user',[UserController::class,'index']);
-// Route::get('/user/tambah',[UserController::class,'tambah']);
-// Route::get('/user/tambah_simpan',[UserController::class,'tambah_simpan']);
-// Route::get('/user/ubah{id}',[UserController::class,'ubah']);
-// Route::put('/user/tambah_simpan',[UserController::class,'ubah_simpan']);
-// Route::get('/user/hapus/{id}',[UserController::class,'hapus']);
-// Route::get('/kategori',[KategoriController::class,'index']);
-// Route::get('/kategori/create',[KategoriController::class,'create']);
-// Route::post('/kategori',[KategoriController::class,'store']);
-// Route::get('/kategori/create',[KategoriController::class,'create'])->name('TambahKategori');
-// Route::get('/kategori/edit/{id}',[kategoriController::class,'edit'])->name('EditKategori');
-// Route::get('/kategori/update/{id}',[KategoriController::class,'update'])->name('UpdateKategori');
-// Route::get('/kategori/delete/{id}',[kategoriController::class,'delete'])->name('DeleteKategori');
-
-
-// Route::get('/',[WelcomeController::class,'index']);
-
-// Route::group(['prefix'=>'user'], function(){
-//     Route::get('/',[UserController::class,'index']);
-//     Route::get('/list',[UserController::class,'list']);
-//     Route::get('/create',[UserController::class,'create']);
-//     // Route::get('/',[UserController::class,'store']);
-//     Route::get('/{id}',[UserController::class,'show']);
-//     Route::get('/{id}/edit',[UserController::class,'edit']);
-//     Route::get('/{id}',[UserController::class,'update']);
-//     Route::get('/{id}',[UserController::class,'destroy']);
-// });
-
 Route::get('/', [WelcomeController::class, 'index']);
 
 Route::group(['prefix'=>'user'], function () {
