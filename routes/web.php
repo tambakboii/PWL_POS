@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\barangController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\stokController;
+use App\Http\Controllers\FileUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,3 +79,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::resource('manager', ManagerController::class);
     });
 });
+
+Route::get('/',function(){
+    return view('welcome');
+});
+Route::get('/fileUpload', [FileUploadController::class,'fileUpload']);
+Route::get('/fileUpload', [FileUploadController::class,'prosesFileUpload']);
